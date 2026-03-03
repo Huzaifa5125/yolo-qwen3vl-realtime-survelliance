@@ -56,5 +56,4 @@ python main.py
 
 Once running, you can access the live Web UI dashboard at `http://localhost:8081` (or the configured `WEB_PORT`).
 
-## License
-MIT
+
