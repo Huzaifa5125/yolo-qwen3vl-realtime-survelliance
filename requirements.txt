@@ -1,0 +1,10 @@
+opencv-python
+ultralytics
+torch
+transformers
+pillow
+scipy
+accelerate
+qwen-vl-utils 
+torchvision
+flask

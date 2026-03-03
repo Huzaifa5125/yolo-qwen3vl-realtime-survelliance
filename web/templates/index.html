@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surveillance VLM Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>🔍 Surveillance VLM Dashboard</h1>
+        <div id="stats-bar">
+            <span id="stat-total">Total: 0</span>
+            <span id="stat-suspicious" class="badge suspicious">Suspicious: 0</span>
+            <span id="stat-normal" class="badge normal">Normal: 0</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Live Feed + Analysis Panel -->
+        <section class="top-panel">
+            <div class="live-feed-container">
+                <h2>📹 Live Feed (YOLOv8s)</h2>
+                <img id="live-feed" src="/video_feed" alt="Live Feed">
+            </div>
+            <div class="analysis-panel">
+                <h2>🧠 VLM Analysis</h2>
+                <div id="analysis-output">
+                    <p class="placeholder">Waiting for analysis...</p>
+                </div>
+                <div id="analysis-meta">
+                    <span id="analysis-classification" class="badge">—</span>
+                    <span id="analysis-frame-id">Frame: —</span>
+                    <span id="analysis-persons">Persons: —</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Saved Frames Browser -->
+        <section class="bottom-panel">
+            <h2>📂 Saved Analyses</h2>
+            <div class="filters">
+                <select id="filter-class">
+                    <option value="">All</option>
+                    <option value="suspicious">Suspicious</option>
+                    <option value="normal">Normal</option>
+                </select>
+                <input type="datetime-local" id="filter-start" placeholder="Start">
+                <input type="datetime-local" id="filter-end" placeholder="End">
+                <button id="btn-filter" onclick="loadAnalyses()">Filter</button>
+                <button id="btn-reset" onclick="resetFilters()">Reset</button>
+            </div>
+            <div id="saved-grid" class="saved-grid">
+                <!-- populated by JS -->
+            </div>
+            <div class="pagination">
+                <button onclick="prevPage()">← Prev</button>
+                <span id="page-info">Page 1</span>
+                <button onclick="nextPage()">Next →</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for full frame view -->
+    <div id="modal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <img id="modal-img" src="" alt="Frame">
+            <div id="modal-text"></div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
