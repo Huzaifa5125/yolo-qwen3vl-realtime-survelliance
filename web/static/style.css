@@ -91,6 +91,20 @@ main {
     margin-bottom: 12px;
     font-size: 1rem;
     color: #8b949e;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.prompt-badge {
+    background: #1f6feb;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 #analysis-output {
@@ -119,6 +133,185 @@ main {
     align-items: center;
     font-size: 0.8rem;
     color: #8b949e;
+}
+
+/* ═══════════════════════════════════════════
+   PROMPT PANEL
+   ═══════════════════════════════════════════ */
+
+.prompt-panel {
+    background: #161b22;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #30363d;
+    margin-bottom: 24px;
+}
+
+.prompt-panel h2 {
+    font-size: 1rem;
+    color: #8b949e;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.prompt-panel h2 .subtitle {
+    font-size: 0.75rem;
+    color: #484f58;
+    font-weight: 400;
+}
+
+/* Preset Buttons Grid */
+.preset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.preset-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 10px;
+    background: #0d1117;
+    border: 2px solid #30363d;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #c9d1d9;
+}
+
+.preset-btn:hover {
+    border-color: #58a6ff;
+    background: #161b22;
+    transform: translateY(-1px);
+}
+
+.preset-btn.active {
+    border-color: #58a6ff;
+    background: #0d1117;
+    box-shadow: 0 0 0 1px #58a6ff, 0 0 12px rgba(88, 166, 255, 0.15);
+}
+
+.preset-icon {
+    font-size: 1.5rem;
+}
+
+.preset-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #c9d1d9;
+}
+
+.preset-desc {
+    font-size: 0.7rem;
+    color: #484f58;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.preset-btn.active .preset-label {
+    color: #58a6ff;
+}
+
+/* Custom Prompt Section */
+.custom-prompt-section {
+    border-top: 1px solid #30363d;
+    padding-top: 16px;
+}
+
+.custom-prompt-section h3 {
+    font-size: 0.9rem;
+    color: #8b949e;
+    margin-bottom: 10px;
+}
+
+.custom-prompt-section textarea {
+    width: 100%;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    color: #c9d1d9;
+    padding: 12px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 60px;
+    transition: border-color 0.2s;
+}
+
+.custom-prompt-section textarea:focus {
+    outline: none;
+    border-color: #58a6ff;
+}
+
+.custom-prompt-section textarea::placeholder {
+    color: #484f58;
+}
+
+.custom-prompt-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+#btn-apply-custom {
+    padding: 8px 20px;
+    background: #238636;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#btn-apply-custom:hover {
+    background: #2ea043;
+}
+
+#btn-view-prompt {
+    padding: 8px 16px;
+    background: #21262d;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+#btn-view-prompt:hover {
+    border-color: #58a6ff;
+}
+
+.prompt-preview {
+    margin-top: 12px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 14px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.prompt-preview.hidden {
+    display: none;
+}
+
+.prompt-preview pre {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: #8b949e;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 /* ─── Bottom Panel: Saved ─── */
@@ -170,6 +363,42 @@ main {
 #btn-reset {
     background: #30363d;
     color: #c9d1d9;
+}
+
+/* ─── Visualization Toggle ─── */
+.viz-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 6px 14px;
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    transition: border-color 0.2s, background 0.2s;
+    user-select: none;
+}
+
+.viz-toggle:hover {
+    border-color: #58a6ff;
+}
+
+.viz-toggle input[type="checkbox"] {
+    accent-color: #58a6ff;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.viz-toggle input[type="checkbox"]:checked + .viz-toggle-label {
+    color: #58a6ff;
+}
+
+.viz-toggle-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8b949e;
+    transition: color 0.2s;
 }
 
 .saved-grid {
@@ -284,4 +513,40 @@ main {
     line-height: 1.6;
     white-space: pre-wrap;
     color: #c9d1d9;
+}
+
+/* ═══════════════════════════════════════════
+   TOAST NOTIFICATION
+   ═══════════════════════════════════════════ */
+
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    z-index: 2000;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+}
+
+.toast-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-success {
+    background: #238636;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(35, 134, 54, 0.4);
+}
+
+.toast-error {
+    background: #da3633;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(218, 54, 51, 0.4);
 }

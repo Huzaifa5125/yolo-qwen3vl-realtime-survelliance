@@ -24,7 +24,7 @@
                 <img id="live-feed" src="/video_feed" alt="Live Feed">
             </div>
             <div class="analysis-panel">
-                <h2>🧠 VLM Analysis</h2>
+                <h2>🧠 VLM Analysis <span id="prompt-badge" class="prompt-badge">general</span></h2>
                 <div id="analysis-output">
                     <p class="placeholder">Waiting for analysis...</p>
                 </div>
@@ -32,6 +32,77 @@
                     <span id="analysis-classification" class="badge">—</span>
                     <span id="analysis-frame-id">Frame: —</span>
                     <span id="analysis-persons">Persons: —</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prompt Control Panel -->
+        <section class="prompt-panel">
+            <h2>🎯 Analysis Focus <span class="subtitle">(changes apply to the next analyzed frame)</span></h2>
+
+            <!-- Preset Buttons -->
+            <div class="preset-grid">
+                <button class="preset-btn active" data-preset="general" onclick="setPreset('general')">
+                    <span class="preset-icon">🔍</span>
+                    <span class="preset-label">General</span>
+                    <span class="preset-desc">Overall surveillance</span>
+                </button>
+                <button class="preset-btn" data-preset="crawling" onclick="setPreset('crawling')">
+                    <span class="preset-icon">🐛</span>
+                    <span class="preset-label">Crawling</span>
+                    <span class="preset-desc">Low posture detection</span>
+                </button>
+                <button class="preset-btn" data-preset="clothing_color" onclick="setPreset('clothing_color')">
+                    <span class="preset-icon">👕</span>
+                    <span class="preset-label">Clothing</span>
+                    <span class="preset-desc">Identify clothing colors</span>
+                </button>
+                <button class="preset-btn" data-preset="running" onclick="setPreset('running')">
+                    <span class="preset-icon">🏃</span>
+                    <span class="preset-label">Running</span>
+                    <span class="preset-desc">High-speed movement</span>
+                </button>
+                <button class="preset-btn" data-preset="fighting" onclick="setPreset('fighting')">
+                    <span class="preset-icon">🥊</span>
+                    <span class="preset-label">Fighting</span>
+                    <span class="preset-desc">Physical altercation</span>
+                </button>
+                <button class="preset-btn" data-preset="loitering" onclick="setPreset('loitering')">
+                    <span class="preset-icon">🚶</span>
+                    <span class="preset-label">Loitering</span>
+                    <span class="preset-desc">Idle / lingering</span>
+                </button>
+                <button class="preset-btn" data-preset="weapon" onclick="setPreset('weapon')">
+                    <span class="preset-icon">🔪</span>
+                    <span class="preset-label">Weapon</span>
+                    <span class="preset-desc">Weapon-like objects</span>
+                </button>
+                <button class="preset-btn" data-preset="trespassing" onclick="setPreset('trespassing')">
+                    <span class="preset-icon">🚧</span>
+                    <span class="preset-label">Trespassing</span>
+                    <span class="preset-desc">Boundary violation</span>
+                </button>
+                <button class="preset-btn" data-preset="abandoned_object" onclick="setPreset('abandoned_object')">
+                    <span class="preset-icon">🎒</span>
+                    <span class="preset-label">Abandoned</span>
+                    <span class="preset-desc">Unattended objects</span>
+                </button>
+            </div>
+
+            <!-- Custom Prompt -->
+            <div class="custom-prompt-section">
+                <h3>✏️ Custom Prompt</h3>
+                <textarea
+                    id="custom-prompt-input"
+                    placeholder="Write your own analysis instruction... e.g. 'Focus on anyone wearing a red jacket near the entrance. Describe their behavior in detail.'"
+                    rows="3"
+                ></textarea>
+                <div class="custom-prompt-actions">
+                    <button id="btn-apply-custom" onclick="applyCustomPrompt()">Apply Custom Prompt</button>
+                    <button id="btn-view-prompt" onclick="togglePromptPreview()">👁️ View Active Prompt</button>
+                </div>
+                <div id="prompt-preview" class="prompt-preview hidden">
+                    <pre id="prompt-preview-text"></pre>
                 </div>
             </div>
         </section>
@@ -49,6 +120,12 @@
                 <input type="datetime-local" id="filter-end" placeholder="End">
                 <button id="btn-filter" onclick="loadAnalyses()">Filter</button>
                 <button id="btn-reset" onclick="resetFilters()">Reset</button>
+
+                <!-- Visualization Toggle -->
+                <label class="viz-toggle" title="Draw bounding boxes on saved frames">
+                    <input type="checkbox" id="toggle-boxes" onchange="loadAnalyses()">
+                    <span class="viz-toggle-label">📦 Show Boxes</span>
+                </label>
             </div>
             <div id="saved-grid" class="saved-grid">
                 <!-- populated by JS -->

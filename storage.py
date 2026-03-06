@@ -11,6 +11,7 @@ class StorageManager:
         self.db_path = DB_PATH
         self.lock = threading.Lock()
         self._init_db()
+        self._migrate_db()
 
     def _get_conn(self):
         return sqlite3.connect(self.db_path)
@@ -23,28 +24,55 @@ class StorageManager:
                 frame_id INTEGER,
                 timestamp REAL,
                 frame_path TEXT,
+                clean_frame_path TEXT,
                 analysis_text TEXT,
                 classification TEXT,
                 person_ids TEXT,
                 num_persons INTEGER,
+                detections_json TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         """)
         conn.commit()
         conn.close()
 
+    def _migrate_db(self):
+        """Add columns if they don't exist (safe for existing databases)."""
+        conn = self._get_conn()
+        cursor = conn.execute("PRAGMA table_info(analyses)")
+        existing_cols = {row[1] for row in cursor.fetchall()}
+
+        if "detections_json" not in existing_cols:
+            conn.execute(
+                "ALTER TABLE analyses ADD COLUMN detections_json TEXT"
+            )
+            print("[DB] Migrated: added 'detections_json' column.")
+
+        if "clean_frame_path" not in existing_cols:
+            conn.execute(
+                "ALTER TABLE analyses ADD COLUMN clean_frame_path TEXT"
+            )
+            print("[DB] Migrated: added 'clean_frame_path' column.")
+
+        conn.commit()
+        conn.close()
+
     def save_analysis(self, frame_id, timestamp, frame_path,
-                      analysis_text, classification, person_ids, num_persons):
+                      clean_frame_path, analysis_text, classification,
+                      person_ids, num_persons, detections_json=None):
         with self.lock:
             conn = self._get_conn()
             conn.execute(
                 """INSERT INTO analyses
-                   (frame_id, timestamp, frame_path, analysis_text,
-                    classification, person_ids, num_persons)
-                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                   (frame_id, timestamp, frame_path, clean_frame_path,
+                    analysis_text, classification, person_ids, num_persons,
+                    detections_json)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
-                    frame_id, timestamp, frame_path, analysis_text,
-                    classification, json.dumps(person_ids), num_persons,
+                    frame_id, timestamp, frame_path, clean_frame_path,
+                    analysis_text, classification,
+                    json.dumps(person_ids), num_persons,
+                    json.dumps(detections_json) if detections_json else None,
                 ),
             )
             conn.commit()
@@ -74,7 +102,20 @@ class StorageManager:
 
             rows = conn.execute(sql, params).fetchall()
             conn.close()
-            return [dict(r) for r in rows]
+
+            results = []
+            for r in rows:
+                d = dict(r)
+                # Parse detections_json back to list for API consumers
+                if d.get("detections_json"):
+                    try:
+                        d["detections_json"] = json.loads(d["detections_json"])
+                    except (json.JSONDecodeError, TypeError):
+                        d["detections_json"] = []
+                else:
+                    d["detections_json"] = []
+                results.append(d)
+            return results
 
     def get_stats(self):
         with self.lock:

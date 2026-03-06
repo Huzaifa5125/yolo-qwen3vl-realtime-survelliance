@@ -46,6 +46,14 @@ Edit `config.py` to fit your setup:
 - `YOLO_MODEL`: The YOLO model file (`yolov8s.pt` by default).
 - `QWEN_MODEL`: The Hugging Face repo for the Qwen VL model.
 
+## Installation & Usage
+
+**Note:** The latest features and updates are located in the `updated-features` branch. To run the updated version, make sure to switch to this branch after cloning:
+
+```bash
+git checkout updated-features
+```
+
 ## Usage
 
 Start the surveillance pipeline:
