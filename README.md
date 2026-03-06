@@ -27,6 +27,14 @@ This project captures an RTSP stream (or local webcam), detects people or object
 
 - Python 3.9+
 - CUDA-compatible GPU (recommended for YOLO and Qwen3-VL).
+  
+## Installation & Usage
+
+**Note:** The latest features and updates are located in the `updated-features` branch. To run the updated version, make sure to switch to this branch after cloning:
+
+```bash
+git checkout updated-features
+```
 
 ### Install Dependencies
 
