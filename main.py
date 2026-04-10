@@ -24,6 +24,12 @@ class SurveillancePipeline:
         self.live_frame = None
         self.live_detections = []
         self.running = False
+        self.total_frames_seen = 0
+        self.yolo_runs = 0
+        self.yolo_total_latency = 0.0
+        self.yolo_min_latency = None
+        self.yolo_max_latency = None
+        self.yolo_frames_with_detections = 0
 
     def start(self):
         self.running = True
@@ -49,6 +55,8 @@ class SurveillancePipeline:
                 time.sleep(0.01)
                 continue
 
+            self.total_frames_seen += 1
+
             # always update live frame for streaming
             with self.lock:
                 self.live_frame = frame.copy()
@@ -56,15 +64,44 @@ class SurveillancePipeline:
             # run YOLO every Nth frame
             if frame_id % DETECTION_EVERY_N == 0 and frame_id != last_processed_id:
                 last_processed_id = frame_id
+                yolo_t0 = time.time()
                 detections = self.detector.detect_and_track(frame)
+                yolo_elapsed = time.time() - yolo_t0
+                self.yolo_runs += 1
+                self.yolo_total_latency += yolo_elapsed
+                if self.yolo_min_latency is None or yolo_elapsed < self.yolo_min_latency:
+                    self.yolo_min_latency = yolo_elapsed
+                if self.yolo_max_latency is None or yolo_elapsed > self.yolo_max_latency:
+                    self.yolo_max_latency = yolo_elapsed
 
                 with self.lock:
                     self.live_detections = detections
 
                 if detections:
+                    self.yolo_frames_with_detections += 1
                     self.buffer.push(frame, detections, frame_id)
+                self.storage.upsert_pipeline_metrics(self.get_pipeline_metrics())
             
             time.sleep(0.001)  # yield CPU
+
+    def get_pipeline_metrics(self):
+        """Aggregate runtime metrics for detector, buffer, and analyzer."""
+        if self.yolo_runs > 0:
+            yolo_avg = self.yolo_total_latency / self.yolo_runs
+        else:
+            yolo_avg = 0.0
+        metrics = {
+            "total_frames_seen": self.total_frames_seen,
+            "yolo_runs": self.yolo_runs,
+            "yolo_total_latency": self.yolo_total_latency,
+            "yolo_avg_latency": yolo_avg,
+            "yolo_min_latency": self.yolo_min_latency,
+            "yolo_max_latency": self.yolo_max_latency,
+            "yolo_frames_with_detections": self.yolo_frames_with_detections,
+        }
+        metrics.update(self.buffer.get_stats())
+        metrics.update(self.analyzer.get_metrics())
+        return metrics
 
     def get_live_frame(self):
         """Get latest frame with YOLO boxes drawn (for MJPEG stream)."""
@@ -77,6 +114,7 @@ class SurveillancePipeline:
         self.running = False
         self.capture.stop()
         self.analyzer.stop()
+        self.storage.upsert_pipeline_metrics(self.get_pipeline_metrics())
 
 
 if __name__ == "__main__":

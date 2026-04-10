@@ -25,6 +25,7 @@ async function fetchLatestAnalysis() {
         const classBadge = document.getElementById("analysis-classification");
         const frameId = document.getElementById("analysis-frame-id");
         const persons = document.getElementById("analysis-persons");
+        const latency = document.getElementById("analysis-latency");
 
         if (data.status === "ok") {
             output.innerHTML = `<p>${escapeHtml(data.text)}</p>`;
@@ -32,6 +33,7 @@ async function fetchLatestAnalysis() {
             classBadge.className = `badge ${data.classification}`;
             frameId.textContent = `Frame: ${data.frame_id}`;
             persons.textContent = `Persons: ${data.person_ids.join(", ")}`;
+            latency.textContent = `Latency: ${(data.vlm_latency || 0).toFixed(2)}s`;
 
             // Show which prompt was used for this analysis
             const promptBadge = document.getElementById("prompt-badge");
@@ -55,6 +57,9 @@ async function fetchStats() {
         document.getElementById("stat-total").textContent = `Total: ${data.total}`;
         document.getElementById("stat-suspicious").textContent = `Suspicious: ${data.suspicious}`;
         document.getElementById("stat-normal").textContent = `Normal: ${data.normal}`;
+        document.getElementById("stat-yolo-latency").textContent = `YOLO Avg: ${Number(data.yolo_avg_latency || 0).toFixed(2)}s`;
+        document.getElementById("stat-vlm-latency").textContent = `VLM Avg: ${Number(data.vlm_avg_latency || 0).toFixed(2)}s`;
+        document.getElementById("stat-frame-drop").textContent = `Dropped Before VLM: ${data.buffer_drops_before_vlm || 0}`;
     } catch (e) {
         console.error("Failed to fetch stats:", e);
     }
@@ -223,6 +228,7 @@ function renderGrid(analyses) {
             : '<span class="badge normal">NORMAL</span>';
 
         const imgUrl = getFrameUrl(a);
+        const latencyText = a.vlm_latency ? `Latency: ${a.vlm_latency.toFixed(2)}s` : '';
 
         return `
             <div class="saved-card" onclick="openModal(${a.id}, \`${escapeHtml(a.analysis_text)}\`)">
@@ -230,6 +236,7 @@ function renderGrid(analyses) {
                 <div class="saved-card-info">
                     <div class="time">${time} ${classBadge}</div>
                     <div class="text-preview">${escapeHtml(preview)}</div>
+                    ${latencyText ? `<div class="text-preview" style="font-size:0.8em; color:#888;">${latencyText}</div>` : ''}
                 </div>
             </div>
         `;

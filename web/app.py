@@ -58,6 +58,7 @@ def create_app(pipeline):
             "person_ids": result["person_ids"],
             "detections": result.get("detections", []),
             "prompt_used": result.get("prompt_used", "general"),
+            "vlm_latency": result.get("vlm_latency", 0),
         })
 
     # ─── API: Get / Set Active Prompt ───

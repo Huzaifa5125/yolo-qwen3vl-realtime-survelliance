@@ -1,7 +1,7 @@
 import os
 
 # ─── RTSP / Camera ───
-RTSP_URL = os.getenv("RTSP_URL", "rtsp://192.168.228.29:8554/mystream")  # "0" = webcam fallback
+RTSP_URL = os.getenv("RTSP_URL", "http://192.168.228.202/video")  # "0" = webcam fallback
 CAPTURE_FPS = 30
 DETECTION_EVERY_N = 5  # run YOLO on every Nth frame
 
@@ -11,11 +11,11 @@ YOLO_DEVICE = f"cuda:{GPU_ID}"
 VLM_DEVICE = f"cuda:{GPU_ID}"
 
 # ─── Models ───
-YOLO_MODEL = "yolov8s.pt"
+YOLO_MODEL = "yolov8m.pt"
 QWEN_MODEL = "Qwen/Qwen3-VL-8B-Instruct"
 
 # ─── Storage ───
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output1")
 FRAMES_DIR = os.path.join(OUTPUT_DIR, "frames")
 DB_PATH = os.path.join(OUTPUT_DIR, "surveillance.db")
 

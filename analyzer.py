@@ -158,6 +158,11 @@ class VLMAnalyzer:
         # latest analysis result (for web UI)
         self.lock = threading.Lock()
         self.latest_analysis = None
+        self.metrics_lock = threading.Lock()
+        self.vlm_frames_processed = 0
+        self.vlm_total_latency = 0.0
+        self.vlm_min_latency = None
+        self.vlm_max_latency = None
 
         print(f"[VLM] Loading Qwen3-VL on cuda:{GPU_ID}...")
         os.environ["CUDA_VISIBLE_DEVICES"] = str(GPU_ID)
@@ -331,6 +336,13 @@ class VLMAnalyzer:
             analysis_text = self.analyze(frame, detections)
             elapsed = time.time() - t0
             print(f"[VLM] Done in {elapsed:.1f}s: {analysis_text[:120]}...")
+            with self.metrics_lock:
+                self.vlm_frames_processed += 1
+                self.vlm_total_latency += elapsed
+                if self.vlm_min_latency is None or elapsed < self.vlm_min_latency:
+                    self.vlm_min_latency = elapsed
+                if self.vlm_max_latency is None or elapsed > self.vlm_max_latency:
+                    self.vlm_max_latency = elapsed
 
             # classify
             classification = (
@@ -380,6 +392,7 @@ class VLMAnalyzer:
                 person_ids=track_ids,
                 num_persons=len(detections),
                 detections_json=detections_for_db,
+                vlm_latency=elapsed,
             )
 
             # update latest for web UI
@@ -394,11 +407,26 @@ class VLMAnalyzer:
                     "clean_frame_path": clean_fpath,
                     "detections": detections_for_db,
                     "prompt_used": prompt_name,
+                    "vlm_latency": elapsed,
                 }
 
     def get_latest(self):
         with self.lock:
             return self.latest_analysis
+
+    def get_metrics(self):
+        with self.metrics_lock:
+            if self.vlm_frames_processed > 0:
+                avg_latency = self.vlm_total_latency / self.vlm_frames_processed
+            else:
+                avg_latency = 0.0
+            return {
+                "vlm_frames_processed": self.vlm_frames_processed,
+                "vlm_total_latency": self.vlm_total_latency,
+                "vlm_avg_latency": avg_latency,
+                "vlm_min_latency": self.vlm_min_latency,
+                "vlm_max_latency": self.vlm_max_latency,
+            }
 
     def stop(self):
         self.running = False
